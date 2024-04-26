@@ -3,25 +3,65 @@ from dataclasses import dataclass
 from environs import Env
 
 
-@dataclass
+@dataclass(frozen=True)
 class DbConfig:
     host: str
-    password: str
-    user: str
+    port: int
     database: str
 
+    @property
+    def sync_url(self) -> str:
+        raise NotImplementedError
 
-@dataclass
+    @property
+    def async_url(self) -> str:
+        raise NotImplementedError
+
+
+@dataclass(frozen=True)
+class PostgresDbConfig(DbConfig):
+    password: str
+    user: str
+
+    @property
+    def sync_url(self) -> str:
+        return (
+            f'postgresql+psycopg2://{self.user}:{self.password}'
+            f'@{self.host}:{self.port}/{self.database}'
+        )
+
+    @property
+    def async_url(self) -> str:
+        return (
+            f'postgresql+asyncpg://{self.user}:{self.password}'
+            f'@{self.host}:{self.port}/{self.database}'
+        )
+
+
+@dataclass(frozen=True)
+class RedisDbConfig(DbConfig):
+    database: int | str = 1
+
+    @property
+    def sync_url(self) -> str:
+        return f'redis://{self.host}:{self.port}/{self.database}'
+
+    @property
+    def async_url(self) -> str:
+        return self.sync_url
+
+
+@dataclass(frozen=True)
 class TgBot:
     token: str
     admin_ids: list[int]
     use_redis: bool
 
 
-@dataclass
+@dataclass(frozen=True)
 class Config:
     tg_bot: TgBot
-    db: DbConfig
+    main_db: PostgresDbConfig
 
 
 def load_config(path: str | None = None):
@@ -35,10 +75,11 @@ def load_config(path: str | None = None):
             admin_ids=env.list('ADMINS'),
             use_redis=env.bool('USE_REDIS'),
         ),
-        db=DbConfig(
+        main_db=PostgresDbConfig(
             host=env.str('DB_HOST'),
+            port=env.int('DB_PORT'),
+            database=env.str('DB_NAME'),
             password=env.str('DB_PASS'),
-            user=env.str('DB_USER'),
-            database=env.str('DB_NAME')
+            user=env.str('DB_USER')
         )
     )

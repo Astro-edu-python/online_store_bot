@@ -8,7 +8,8 @@ from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from tgbot.config import load_config
 from tgbot.filters import register_all_filters
 from tgbot.handlers import register_all_handlers
-from tgbot.utils.bot import install_bot_commands
+from tgbot.models import Base
+from tgbot.utils.bot import install_bot_commands, notify_admins_message
 
 logger = logging.getLogger(__name__)
 
@@ -32,14 +33,22 @@ async def main():
     register_all_filters(dp)
     register_all_handlers(dp)
     await install_bot_commands(bot)
+    await Base.set_bind(config.main_db.async_url)
 
     try:
         await dp.start_polling()
+    except Exception as error:
+        message = f'UNEXPECTED ERROR {error}. Error args: {error.args}'
+        logger.warning(message)
+        await notify_admins_message(
+            config.tg_bot.admin_ids, bot, message
+        )
     finally:
         await dp.storage.close()
         await dp.storage.wait_closed()
         session = await bot.get_session()
         await session.close()
+        await Base.pop_bind().close()
 
 
 if __name__ == '__main__':

@@ -13,6 +13,9 @@ ujson = "^5.9.0"
 aiodns = "^3.2.0"
 aiohttp = {version = "3.8.6", extras = ["speedups"]}
 environs = "^11.0.0"
+alembic = "^1.13.1"
+gino = "^1.0.1"
+psycopg2-binary = "^2.9.9"
 
 
 [build-system]
