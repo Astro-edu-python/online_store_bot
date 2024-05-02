@@ -3,3 +3,8 @@ from enum import Enum
 
 class UserCommands(Enum):
     start = 'Старт бота'
+
+
+class SuperuserReplyKeyboardCommands(Enum):
+    add_admin = 'Назначить админа 🤴'
+    delete_admin = 'Убрать админа 🤴💀'

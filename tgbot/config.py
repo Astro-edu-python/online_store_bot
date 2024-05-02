@@ -72,7 +72,7 @@ def load_config(path: str | None = None):
     return Config(
         tg_bot=TgBot(
             token=env.str('BOT_TOKEN'),
-            admin_ids=env.list('ADMINS'),
+            admin_ids=[int(id_) for id_ in env.list('ADMINS')],
             use_redis=env.bool('USE_REDIS'),
         ),
         main_db=PostgresDbConfig(

@@ -1,5 +1,7 @@
-from .admin import AdminFilter
+from aiogram import Dispatcher
+
+from .superuser import IsSuperuser
 
 
-def register_all_filters(dp):
-    dp.filters_factory.bind(AdminFilter)
+def register_all_filters(dp: Dispatcher):
+    dp.filters_factory.bind(IsSuperuser)

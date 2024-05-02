@@ -36,6 +36,9 @@ async def main():
     await Base.set_bind(config.main_db.async_url)
 
     try:
+        await dp.reset_webhook(True)
+        await dp.skip_updates()
+        logger.info('UPDATES WERE SKIPPED')
         await dp.start_polling()
     except Exception as error:
         message = f'UNEXPECTED ERROR {error}. Error args: {error.args}'
