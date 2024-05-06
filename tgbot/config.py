@@ -59,9 +59,15 @@ class TgBot:
 
 
 @dataclass(frozen=True)
+class Misc:
+    PAGINATE_PER_COUNT: int = 12
+
+
+@dataclass(frozen=True)
 class Config:
     tg_bot: TgBot
     main_db: PostgresDbConfig
+    misc: Misc
 
 
 def load_config(path: str | None = None):
@@ -81,5 +87,6 @@ def load_config(path: str | None = None):
             database=env.str('DB_NAME'),
             password=env.str('DB_PASS'),
             user=env.str('DB_USER')
-        )
+        ),
+        misc=Misc()
     )
