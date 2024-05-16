@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, BigInteger, Boolean
+from sqlalchemy import Column, BigInteger, Boolean
 
 from tgbot.models import Base
 

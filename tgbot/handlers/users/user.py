@@ -5,7 +5,7 @@ from tgbot.constants.commands import UserCommands
 
 
 async def user_start(message: Message):
-    await message.reply('Hello, user!')
+    await message.reply('Приветствую пользователь!')
 
 
 def register_user(dp: Dispatcher):

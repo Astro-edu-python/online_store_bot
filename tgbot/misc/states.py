@@ -7,3 +7,12 @@ class AddAdminState(StatesGroup):
 
 class DeleteAdminState(StatesGroup):
     choose_admin_callback = State()
+
+
+class AddProductState(StatesGroup):
+    choose_categories = State()
+    name = State()
+    description = State()
+    price = State()
+    stock = State()
+    photo = State()

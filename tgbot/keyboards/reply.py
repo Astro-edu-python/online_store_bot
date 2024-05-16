@@ -1,7 +1,11 @@
 from aiogram.types import ReplyKeyboardMarkup
 
-from tgbot.buttons.reply import SUPERUSER_ADD_ADMIN, SUPERUSER_DELETE_ADMIN
+import tgbot.buttons.reply as rkb
 
-SUPERUSER_START_KEYBOARD = ReplyKeyboardMarkup([
-    [SUPERUSER_ADD_ADMIN, SUPERUSER_DELETE_ADMIN]
+
+ADMIN_START_KEYBOARD = ReplyKeyboardMarkup([
+    [rkb.ADMIN_ADD_PRODUCT]
 ], resize_keyboard=True)
+SUPERUSER_START_KEYBOARD = ReplyKeyboardMarkup([
+    [rkb.SUPERUSER_ADD_ADMIN, rkb.SUPERUSER_DELETE_ADMIN],
+] + ADMIN_START_KEYBOARD.keyboard, resize_keyboard=True)
