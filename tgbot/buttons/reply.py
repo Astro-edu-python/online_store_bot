@@ -13,3 +13,6 @@ SUPERUSER_DELETE_ADMIN = KeyboardButton(
 ADMIN_ADD_PRODUCT = KeyboardButton(
     AdminsReplyKeyboardCommands.add_product.value
 )
+PRODUCTS_LIST_COMMAND = KeyboardButton(
+    AdminsReplyKeyboardCommands.products_list.value
+)

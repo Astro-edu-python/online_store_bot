@@ -62,7 +62,8 @@ class TgBot:
 
 @dataclass(frozen=True)
 class Misc:
-    PAGINATE_PER_COUNT: int = 12
+    ADMINS_PAGINATE_PER_COUNT: int = 12
+    PRODUCTS_PAGINATE_PER_COUNT: int = 1
     MEDIA_DIR: Path = Path(__file__).parent.parent / 'media'
     PHOTOS_DIR: Path = MEDIA_DIR / 'photos'
     PRODUCT_PHOTOS_DIR: Path = PHOTOS_DIR / 'product'

@@ -8,6 +8,7 @@ from tgbot.constants.commands import AdminsReplyKeyboardCommands
 from tgbot.keyboards.inline import make_inline_kb_from_obj_list
 from tgbot.misc.states import AddProductState
 from tgbot.models.products import Category, Product
+from tgbot.utils.text import product_info_text
 
 
 async def add_product_command(message: Message):
@@ -120,13 +121,7 @@ async def upload_product_photo_and_save(message: Message, state: FSMContext):
     product = await Product.create(**data)
     await state.finish()
     await message.answer('Успешно создал товар')
-    text = (
-        f'Продукт: {product.name}',
-        f'Категория: {product.category}',
-        f'Описание: {product.description}',
-        f'Цена: {product.price}',
-        f'Кол-во в наличии: {product.stock}',
-    )
+    text = product_info_text(product)
     await message.bot.send_photo(
         message.from_user.id,
         InputFile(product.photo),

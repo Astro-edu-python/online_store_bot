@@ -25,9 +25,14 @@ class PagePaginator:
         return self.__page_per_count
 
     async def pages_count(self) -> int:
-        count = await Base.select([Base.func.count()]).where(
-            self.__condition
-        ).gino.scalar()
+        if self.__condition:
+            count = await Base.select([Base.func.count(
+                self.__model.id
+            )]).where(self.__condition).gino.scalar()
+        else:
+            count = await Base.select([
+                Base.func.count(self.__model.id)
+            ]).gino.scalar()
         pages_count = count // self.__page_per_count or 1
         return pages_count
 
@@ -39,7 +44,7 @@ class PagePaginator:
 
     async def paginate(
         self, order_by: str = 'id'
-    ):
+    ) -> list[Base.Model]:
         if self.__page_num == 1:
             offset = 0
         else:

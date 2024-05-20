@@ -16,3 +16,12 @@ class AddProductState(StatesGroup):
     price = State()
     stock = State()
     photo = State()
+
+
+class ManageProductState(StatesGroup):
+    choose_product_callback = State()
+
+
+class ChangeProductState(StatesGroup):
+    choose_field = State()
+    value = State()

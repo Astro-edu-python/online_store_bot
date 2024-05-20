@@ -12,3 +12,4 @@ class SuperuserReplyKeyboardCommands(Enum):
 
 class AdminsReplyKeyboardCommands(Enum):
     add_product = 'Добавить продукт 🏺'
+    products_list = 'Продукты 🥡'
