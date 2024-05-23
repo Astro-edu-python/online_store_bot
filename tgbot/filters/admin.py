@@ -1,18 +1,23 @@
-import typing
-
 from aiogram.dispatcher.filters import BoundFilter
+from aiogram.types import Message, CallbackQuery
+from sqlalchemy import and_
 
 from tgbot.config import Config
+from tgbot.models.user import User
 
 
 class AdminFilter(BoundFilter):
     key = 'is_admin'
 
-    def __init__(self, is_admin: typing.Optional[bool] = None):
+    def __init__(self, is_admin: bool | None = None):
         self.is_admin = is_admin
 
-    async def check(self, obj):
+    async def check(self, message: Message | CallbackQuery) -> bool:
+        config: Config = message.bot['config']
         if self.is_admin is None:
             return False
-        config: Config = obj.bot.get('config')
-        return (obj.from_user.id in config.tg_bot.admin_ids) == self.is_admin
+        user = await User.query.where(and_(
+            User.is_admin == self.is_admin,
+            User.id == message.from_user.id,
+        )).gino.first()
+        return bool(user) or message.from_user.id in config.tg_bot.admin_ids

@@ -1,4 +1,6 @@
+import os
 from dataclasses import dataclass
+from pathlib import Path
 
 from environs import Env
 
@@ -59,20 +61,44 @@ class TgBot:
 
 
 @dataclass(frozen=True)
+class Misc:
+    ADMINS_PAGINATE_PER_COUNT: int = 12
+    PRODUCTS_PAGINATE_PER_COUNT: int = 1
+    MEDIA_DIR: Path = Path(__file__).parent.parent / 'media'
+    PHOTOS_DIR: Path = MEDIA_DIR / 'photos'
+    PRODUCT_PHOTOS_DIR: Path = PHOTOS_DIR / 'product'
+
+
+@dataclass(frozen=True)
 class Config:
     tg_bot: TgBot
     main_db: PostgresDbConfig
+    misc: Misc
+
+
+def make_dirs_if_not_exist(path: Path | str) -> Path | str:
+    if not os.path.exists(path):
+        os.makedirs(path)
+    return path
+
+
+def make_misc_dirs(misc: Misc) -> Misc:
+    for attr_name, attr_value in misc.__dict__.items():
+        if isinstance(attr_value, Path):
+            make_dirs_if_not_exist(attr_value)
+    return misc
 
 
 def load_config(path: str | None = None):
     env = Env()
     if path:
         env.read_env(path)
-
+    misc = Misc()
+    make_misc_dirs(misc)
     return Config(
         tg_bot=TgBot(
             token=env.str('BOT_TOKEN'),
-            admin_ids=env.list('ADMINS'),
+            admin_ids=[int(id_) for id_ in env.list('ADMINS')],
             use_redis=env.bool('USE_REDIS'),
         ),
         main_db=PostgresDbConfig(
@@ -81,5 +107,6 @@ def load_config(path: str | None = None):
             database=env.str('DB_NAME'),
             password=env.str('DB_PASS'),
             user=env.str('DB_USER')
-        )
+        ),
+        misc=misc
     )
