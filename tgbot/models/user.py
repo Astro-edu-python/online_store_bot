@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, BigInteger, Boolean
+from sqlalchemy import Column, BigInteger, Boolean, ForeignKey
 
 from tgbot.models import Base
 
@@ -11,6 +11,10 @@ class User(Base.Model):
     phone_number = Column(BigInteger())
     is_admin = Column(
         Boolean(), default=False, nullable=False, server_default='f'
+    )
+    referrer_user_id = Column(
+        BigInteger, ForeignKey(f'{__tablename__}.id', ondelete='CASCADE'),
+        nullable=True
     )
 
     def __str__(self) -> str:

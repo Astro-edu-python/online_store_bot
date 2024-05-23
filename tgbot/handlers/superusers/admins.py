@@ -14,7 +14,7 @@ from tgbot.utils.text import user_mention_text_html
 async def add_admin_command(message: Message):
     config: Config = message.bot['config']
     paginator = BotPagePaginator(
-        config.misc.PAGINATE_PER_COUNT, User,
+        config.misc.ADMINS_PAGINATE_PER_COUNT, User,
         condition=User.is_admin == False
     )
     users: list[User] = await paginator.paginate()
@@ -38,7 +38,7 @@ async def add_admin_callback(callback: CallbackQuery, state: FSMContext):
         config: Config = callback.bot['config']
         page_num = int(callback.data.split('_')[-1])
         paginator = BotPagePaginator(
-            config.misc.PAGINATE_PER_COUNT, User, page_num,
+            config.misc.ADMINS_PAGINATE_PER_COUNT, User, page_num,
             condition=User.is_admin == False
         )
         users: list[User] = await paginator.paginate()
