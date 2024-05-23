@@ -67,6 +67,7 @@ class Misc:
     MEDIA_DIR: Path = Path(__file__).parent.parent / 'media'
     PHOTOS_DIR: Path = MEDIA_DIR / 'photos'
     PRODUCT_PHOTOS_DIR: Path = PHOTOS_DIR / 'product'
+    QR_CODES_DIR: Path = PHOTOS_DIR / 'qr_codes'
 
 
 @dataclass(frozen=True)

@@ -6,7 +6,7 @@ from tgbot.constants.commands import UserCommands, UserReplyKeyboardCommands
 from tgbot.keyboards.reply import USER_REGISTER_KEYBOARD, USER_START_KEYBOARD
 from tgbot.misc.states import RegisterUserState
 from tgbot.models.user import User
-from tgbot.utils.text import get_referrer_link_html
+from tgbot.utils.text import get_referrer_link
 
 
 async def user_start(message: Message, state: FSMContext):
@@ -65,7 +65,7 @@ async def show_user_referrer_link(message: Message):
     bot_info = await message.bot.get_me()
     await message.answer(
         f'Ваша реферальная ссылка: '
-        f'{get_referrer_link_html(bot_info.username, message.from_user.id)}'
+        f'{get_referrer_link(bot_info.username, message.from_user.id)}'
     )
 
 

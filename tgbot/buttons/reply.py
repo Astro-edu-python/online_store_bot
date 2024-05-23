@@ -23,3 +23,6 @@ SEND_CONTACT_BUTTON = KeyboardButton(
 USER_REFERRER_LINK = KeyboardButton(
     UserReplyKeyboardCommands.referrer_link.value
 )
+USER_QR_CODE = KeyboardButton(
+    UserReplyKeyboardCommands.referrer_link_qr_code.value
+)
