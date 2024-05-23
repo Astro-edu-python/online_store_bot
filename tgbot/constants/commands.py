@@ -3,6 +3,7 @@ from enum import Enum
 
 class UserCommands(Enum):
     start = 'Старт бота'
+    share_number = 'Поделиться номером 📞'
 
 
 class SuperuserReplyKeyboardCommands(Enum):

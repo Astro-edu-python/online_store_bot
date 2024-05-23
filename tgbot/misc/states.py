@@ -25,3 +25,7 @@ class ManageProductState(StatesGroup):
 class ChangeProductState(StatesGroup):
     choose_field = State()
     value = State()
+
+
+class RegisterUserState(StatesGroup):
+    send_number = State()
