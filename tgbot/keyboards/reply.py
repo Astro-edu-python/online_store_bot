@@ -12,3 +12,6 @@ SUPERUSER_START_KEYBOARD = ReplyKeyboardMarkup([
 USER_REGISTER_KEYBOARD = ReplyKeyboardMarkup(
     [[rkb.SEND_CONTACT_BUTTON]], resize_keyboard=True
 )
+USER_START_KEYBOARD = ReplyKeyboardMarkup([
+    [rkb.USER_REFERRER_LINK]
+], resize_keyboard=True)

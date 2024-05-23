@@ -2,7 +2,7 @@ from aiogram.types import KeyboardButton
 
 from tgbot.constants.commands import (
     SuperuserReplyKeyboardCommands, AdminsReplyKeyboardCommands,
-    UserCommands
+    UserReplyKeyboardCommands
 )
 
 SUPERUSER_ADD_ADMIN = KeyboardButton(
@@ -18,5 +18,8 @@ PRODUCTS_LIST_COMMAND = KeyboardButton(
     AdminsReplyKeyboardCommands.products_list.value
 )
 SEND_CONTACT_BUTTON = KeyboardButton(
-    UserCommands.share_number.value, request_contact=True
+    UserReplyKeyboardCommands.share_number.value, request_contact=True
+)
+USER_REFERRER_LINK = KeyboardButton(
+    UserReplyKeyboardCommands.referrer_link.value
 )

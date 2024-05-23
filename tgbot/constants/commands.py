@@ -3,7 +3,11 @@ from enum import Enum
 
 class UserCommands(Enum):
     start = 'Старт бота'
+
+
+class UserReplyKeyboardCommands(Enum):
     share_number = 'Поделиться номером 📞'
+    referrer_link = 'Моя реферальная ссылка 🔗'
 
 
 class SuperuserReplyKeyboardCommands(Enum):

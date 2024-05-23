@@ -7,7 +7,10 @@ class Category(Base.Model):
     __tablename__ = 'categories'
 
     name = Column(String, primary_key=True, nullable=False)
-    parent = Column(String, ForeignKey(f'{__tablename__}.name'), nullable=True)
+    parent = Column(
+        String, ForeignKey(f'{__tablename__}.name', ondelete='CASCADE'),
+        nullable=True
+    )
 
     def __str__(self):
         return self.name
@@ -22,7 +25,7 @@ class Product(Base.Model):
     id = Column(Integer, primary_key=True, index=True)
     category = Column(
         String,
-        ForeignKey(f'{Category.__tablename__}.name'),
+        ForeignKey(f'{Category.__tablename__}.name', ondelete='CASCADE'),
         nullable=False
     )
     name = Column(String(75), unique=True, nullable=False)
