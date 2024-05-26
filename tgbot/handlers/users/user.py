@@ -10,6 +10,7 @@ from tgbot.utils.text import get_referrer_link
 
 
 async def user_start(message: Message, state: FSMContext):
+    await state.finish()
     await message.reply(
         'Приветствую пользователь!',
         reply_markup=ReplyKeyboardRemove()
@@ -71,13 +72,14 @@ async def show_user_referrer_link(message: Message):
 
 def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(
-        user_start, commands=[UserCommands.start.name], state='*'
+        user_start, commands=[UserCommands.start.name], state='*',
+        is_admin=False,
     )
     dp.register_message_handler(
         register_user, state=RegisterUserState.send_number,
-        content_types=ContentTypes.CONTACT
+        content_types=ContentTypes.CONTACT, is_admin=False,
     )
     dp.register_message_handler(
         show_user_referrer_link,
-        text=UserReplyKeyboardCommands.referrer_link.value
+        text=UserReplyKeyboardCommands.referrer_link.value, is_admin=False
     )

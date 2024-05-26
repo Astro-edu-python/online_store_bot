@@ -17,7 +17,9 @@ class AdminFilter(BoundFilter):
         if self.is_admin is None:
             return False
         user = await User.query.where(and_(
-            User.is_admin == self.is_admin,
+            User.is_admin == True,
             User.id == message.from_user.id,
         )).gino.first()
-        return bool(user) or message.from_user.id in config.tg_bot.admin_ids
+        return (
+            bool(user) or message.from_user.id in config.tg_bot.admin_ids
+        ) == self.is_admin

@@ -1,11 +1,13 @@
 from aiogram import Dispatcher
+from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 
 from tgbot.constants.commands import UserCommands
 from tgbot.keyboards.reply import ADMIN_START_KEYBOARD
 
 
-async def start_admin(message: Message):
+async def start_admin(message: Message, state: FSMContext) -> None:
+    await state.finish()
     await message.answer(
         'Приветствую, админ!',
         reply_markup=ADMIN_START_KEYBOARD
