@@ -1,5 +1,6 @@
 from aiogram import Dispatcher
 
+from .balance import register_balance_handlers
 from .qr_code import register_qr_code_handlers
 from .user import register_user_handlers
 
@@ -7,3 +8,4 @@ from .user import register_user_handlers
 def register_all_user_handlers(dp: Dispatcher):
     register_qr_code_handlers(dp)
     register_user_handlers(dp)
+    register_balance_handlers(dp)

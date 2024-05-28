@@ -26,3 +26,9 @@ USER_REFERRER_LINK = KeyboardButton(
 USER_QR_CODE = KeyboardButton(
     UserReplyKeyboardCommands.referrer_link_qr_code.value
 )
+ADD_BALANCE_BUTTON = KeyboardButton(
+    UserReplyKeyboardCommands.add_balance.value
+)
+MY_BALANCE_BUTTON = KeyboardButton(
+    UserReplyKeyboardCommands.my_balance.value
+)

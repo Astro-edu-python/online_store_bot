@@ -26,5 +26,5 @@ def register_qr_code_handlers(dp: Dispatcher):
     dp.register_message_handler(
         get_user_qr_code,
         text=UserReplyKeyboardCommands.referrer_link_qr_code.value,
-        is_admin=False
+        is_admin=False, is_authenticated=True
     )

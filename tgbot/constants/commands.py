@@ -9,6 +9,8 @@ class UserReplyKeyboardCommands(Enum):
     share_number = 'Поделиться номером 📞'
     referrer_link = 'Моя реферальная ссылка 🔗'
     referrer_link_qr_code = 'Мой QR код 🖼️'
+    add_balance = 'Пополнить баланс 💰'
+    my_balance = 'Мой баланс 🤑'
 
 
 class SuperuserReplyKeyboardCommands(Enum):
