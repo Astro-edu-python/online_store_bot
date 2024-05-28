@@ -7,7 +7,7 @@ from tgbot.constants.commands import UserCommands, UserReplyKeyboardCommands
 from tgbot.keyboards.reply import USER_REGISTER_KEYBOARD, USER_START_KEYBOARD
 from tgbot.misc.states import RegisterUserState
 from tgbot.models.user import User
-from tgbot.utils.text import get_referrer_link
+from tgbot.utils.text import get_referrer_link, user_mention_text_html
 
 
 async def user_start(message: Message, state: FSMContext):
@@ -61,6 +61,23 @@ async def register_user(message: Message, state: FSMContext):
             f'Вам начислен бонус {config.tg_bot.referred_user_bonus} '
             f'{config.tg_bot.payment_currency.name}'
         )
+        referrer: User | None = await User.get(referrer_id)
+        if referrer:
+            await referrer.update(
+                balance=referrer.balance + config.tg_bot.referred_user_bonus
+            ).apply()
+            user_mention = user_mention_text_html(
+                message.from_user.id, str(message.from_user.id)
+            )
+            await message.bot.send_message(
+                referrer_id,
+                f'Пользователь {user_mention} присоединился по вашей рефералке'
+            )
+            await message.bot.send_message(
+                referrer_id,
+                f'Вам начислен бонус {config.tg_bot.referred_user_bonus} '
+                f'{config.tg_bot.payment_currency.name} за рефералку'
+            )
     else:
         await User.create(
             id=message.from_user.id, phone_number=phone_number
