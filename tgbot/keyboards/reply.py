@@ -13,5 +13,6 @@ USER_REGISTER_KEYBOARD = ReplyKeyboardMarkup(
     [[rkb.SEND_CONTACT_BUTTON]], resize_keyboard=True
 )
 USER_START_KEYBOARD = ReplyKeyboardMarkup([
-    [rkb.USER_REFERRER_LINK, rkb.USER_QR_CODE]
+    [rkb.USER_REFERRER_LINK, rkb.USER_QR_CODE],
+    [rkb.ADD_BALANCE_BUTTON, rkb.MY_BALANCE_BUTTON]
 ], resize_keyboard=True)

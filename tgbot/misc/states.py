@@ -29,3 +29,9 @@ class ChangeProductState(StatesGroup):
 
 class RegisterUserState(StatesGroup):
     send_number = State()
+
+
+class AddPaymentState(StatesGroup):
+    get_sum = State()
+    pre_checkout = State()
+    success = State()

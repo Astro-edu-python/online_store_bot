@@ -4,6 +4,8 @@ from pathlib import Path
 
 from environs import Env
 
+from tgbot.services.payment.service import Currency, UzSumCurrency
+
 
 @dataclass(frozen=True)
 class DbConfig:
@@ -58,6 +60,9 @@ class TgBot:
     token: str
     admin_ids: list[int]
     use_redis: bool
+    payment_token: str
+    payment_currency: Currency
+    referred_user_bonus: int
 
 
 @dataclass(frozen=True)
@@ -101,6 +106,14 @@ def load_config(path: str | None = None):
             token=env.str('BOT_TOKEN'),
             admin_ids=[int(id_) for id_ in env.list('ADMINS')],
             use_redis=env.bool('USE_REDIS'),
+            payment_token=env.str('PAYMENT_TOKEN'),
+            payment_currency=UzSumCurrency(
+                env.str('PAYMENT_CURRENCY_NAME'),
+                env.str('PAYMENT_CURRENCY_CODE'),
+                env.int('PAYMENT_CURRENCY_MIN_PRICE'),
+                env.int('PAYMENT_CURRENCY_MAX_PRICE'),
+            ),
+            referred_user_bonus=env.int('REFERRED_USER_BONUS'),
         ),
         main_db=PostgresDbConfig(
             host=env.str('DB_HOST'),

@@ -16,6 +16,9 @@ class User(Base.Model):
         BigInteger, ForeignKey(f'{__tablename__}.id', ondelete='CASCADE'),
         nullable=True
     )
+    balance = Column(
+        BigInteger(), default=0, nullable=False, server_default='0'
+    )
 
     def __str__(self) -> str:
         return f'{self.id}'
