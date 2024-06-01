@@ -1,7 +1,10 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton
 
 RESUME_WITHOUT_INNER_CATEGORY = InlineKeyboardButton(
     'Продолжить без вложенных категорий ➡️', callback_data='resume'
+)
+SHOW_CATEGORY_PRODUCTS = InlineKeyboardButton(
+    'Показать товары этой категории', callback_data='show_category_products'
 )
 
 

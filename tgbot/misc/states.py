@@ -35,3 +35,8 @@ class AddPaymentState(StatesGroup):
     get_sum = State()
     pre_checkout = State()
     success = State()
+
+
+class ShowProductsState(StatesGroup):
+    choose_category = State()
+    choose_product = State()

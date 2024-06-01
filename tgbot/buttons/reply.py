@@ -32,3 +32,6 @@ ADD_BALANCE_BUTTON = KeyboardButton(
 MY_BALANCE_BUTTON = KeyboardButton(
     UserReplyKeyboardCommands.my_balance.value
 )
+PRODUCTS_LIST_USER_COMMAND = KeyboardButton(
+    UserReplyKeyboardCommands.products.value
+)

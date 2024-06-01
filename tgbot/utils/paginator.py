@@ -21,11 +21,15 @@ class PagePaginator:
         return self.__page_num
 
     @property
+    def condition(self):
+        return self.__condition
+
+    @property
     def page_per_count(self) -> int:
         return self.__page_per_count
 
     async def pages_count(self) -> int:
-        if self.__condition:
+        if self.condition is not None:
             count = await Base.select([Base.func.count(
                 self.__model.id
             )]).where(self.__condition).gino.scalar()
@@ -51,7 +55,7 @@ class PagePaginator:
             offset = self.__page_per_count * self.__page_num - 1
         async with Base.transaction():
             cursor = await (
-                self.__condition_parse(self.__condition)
+                self.__condition_parse(self.condition)
                 .order_by(order_by).gino.iterate()
             )
             if offset:
@@ -94,11 +98,17 @@ class BotPagePaginator(PagePaginator):
         has_next = await self.has_next_page()
         has_prev = await self.has_prev_page()
         if has_next:
-            keyboard.inline_keyboard[-1].append(
-                self.has_next_page_inline_btn()
-            )
+            if keyboard.inline_keyboard:
+                keyboard.inline_keyboard[-1].append(
+                    self.has_next_page_inline_btn()
+                )
+            else:
+                keyboard.add(self.has_next_page_inline_btn())
         if has_prev:
-            keyboard.inline_keyboard[0].insert(
-                0, self.has_prev_page_inline_btn()
-            )
+            if keyboard.inline_keyboard:
+                keyboard.inline_keyboard[0].insert(
+                    0, self.has_prev_page_inline_btn()
+                )
+            else:
+                keyboard.add(self.has_prev_page_inline_btn())
         return keyboard

@@ -11,6 +11,7 @@ class UserReplyKeyboardCommands(Enum):
     referrer_link_qr_code = 'Мой QR код 🖼️'
     add_balance = 'Пополнить баланс 💰'
     my_balance = 'Мой баланс 🤑'
+    products = 'Товары 🏺'
 
 
 class SuperuserReplyKeyboardCommands(Enum):
