@@ -79,6 +79,7 @@ class Misc:
 class Config:
     tg_bot: TgBot
     main_db: PostgresDbConfig
+    cache_db: RedisDbConfig
     misc: Misc
 
 
@@ -122,5 +123,10 @@ def load_config(path: str | None = None):
             password=env.str('DB_PASS'),
             user=env.str('DB_USER')
         ),
-        misc=misc
+        misc=misc,
+        cache_db=RedisDbConfig(
+            host=env.str('REDIS_HOST'),
+            port=env.int('REDIS_PORT'),
+            database=env.int('REDIS_DB'),
+        )
     )

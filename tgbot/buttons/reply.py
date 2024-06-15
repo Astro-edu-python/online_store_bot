@@ -35,3 +35,6 @@ MY_BALANCE_BUTTON = KeyboardButton(
 PRODUCTS_LIST_USER_COMMAND = KeyboardButton(
     UserReplyKeyboardCommands.products.value
 )
+MY_BASKET_BUTTON = KeyboardButton(
+    UserReplyKeyboardCommands.my_basket.value
+)

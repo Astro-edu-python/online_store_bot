@@ -3,13 +3,15 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import (
     Message, CallbackQuery, InputFile, InlineKeyboardMarkup
 )
+from redis.asyncio import Redis
 
-from tgbot.buttons.inline import SHOW_CATEGORY_PRODUCTS
+from tgbot.buttons.inline import SHOW_CATEGORY_PRODUCTS, make_cart_inline_kb
 from tgbot.config import Config
 from tgbot.constants.commands import UserReplyKeyboardCommands
 from tgbot.keyboards.inline import make_inline_kb_from_obj_list
 from tgbot.misc.states import ShowProductsState
 from tgbot.models.products import Category, Product
+from tgbot.services.basket.types import UserProfile, UserBasket
 from tgbot.utils.paginator import BotPagePaginator
 from tgbot.utils.text import product_info_text
 
@@ -48,6 +50,7 @@ async def choose_product_category_callback(
                 return
             await ShowProductsState.choose_product.set()
             keyboard = InlineKeyboardMarkup()
+            keyboard.add(make_cart_inline_kb(products[0].id))
             await paginator.add_navigate_keyboard_if_exists(keyboard)
             await callback.bot.send_photo(
                 callback.from_user.id,
@@ -76,7 +79,7 @@ async def choose_product_category_callback(
         )
 
 
-async def choose_products_callback(callback: CallbackQuery):
+async def choose_products_callback(callback: CallbackQuery, state: FSMContext):
     if 'page' in callback.data:
         config: Config = callback.bot['config']
         page_num = int(callback.data.split('_')[-1])
@@ -85,6 +88,7 @@ async def choose_products_callback(callback: CallbackQuery):
         )
         product: list[Product] = await paginator.paginate()
         keyboard = InlineKeyboardMarkup()
+        keyboard.add(make_cart_inline_kb(product[0].id))
         await paginator.add_navigate_keyboard_if_exists(keyboard)
         await callback.bot.send_photo(
             callback.from_user.id,
@@ -92,6 +96,20 @@ async def choose_products_callback(callback: CallbackQuery):
             product_info_text(product[0]),
             reply_markup=keyboard
         )
+    elif 'basket_' in callback.data:
+        product_id = int(callback.data.split('basket_')[-1])
+        redis: Redis = callback.bot['cache_db']
+        user = await UserProfile.load(redis, callback.from_user.id)
+        if not user:
+            user = UserProfile(callback.from_user.id, UserBasket([product_id]))
+        else:
+            user.basket.add_product(product_id)
+        await user.insert_to_db(redis)
+        await callback.bot.send_message(
+            callback.from_user.id,
+            'Успешно добавил в корзину'
+        )
+        await state.finish()
     await callback.bot.delete_message(
         callback.from_user.id,
         callback.message.message_id

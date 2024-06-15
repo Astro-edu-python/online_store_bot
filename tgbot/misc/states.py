@@ -40,3 +40,7 @@ class AddPaymentState(StatesGroup):
 class ShowProductsState(StatesGroup):
     choose_category = State()
     choose_product = State()
+
+
+class BasketShowState(StatesGroup):
+    choose_product = State()

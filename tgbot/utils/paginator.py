@@ -1,6 +1,7 @@
 from typing import Any
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from redis.asyncio import Redis
 
 from tgbot.models import Base
 

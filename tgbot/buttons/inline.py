@@ -31,6 +31,22 @@ def make_change_inline_kb(
     return make_inline_kb_button('Изменить 📃', callback_data)
 
 
+def make_cart_inline_kb(
+    callback_data: str | int | float | bool | None = None
+) -> InlineKeyboardButton:
+    return make_inline_kb_button(
+        'В корзину 🧺', f'basket_{callback_data}'
+    )
+
+
+def make_buy_inline_kb(
+    callback_data: str | int | float | bool | None = None
+) -> InlineKeyboardButton:
+    return make_inline_kb_button(
+        'Купить 💲', f'buy_{callback_data}'
+    )
+
+
 def make_inline_kb_button_from_obj(
     obj: object, attr_name: str, callback_attr_name: str | None = None
 ) -> InlineKeyboardButton:

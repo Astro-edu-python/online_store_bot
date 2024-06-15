@@ -4,6 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
+from redis.asyncio import Redis
 
 from tgbot.config import load_config
 from tgbot.filters import register_all_filters
@@ -26,10 +27,16 @@ async def main():
     config = load_config('.env')
 
     storage = RedisStorage2() if config.tg_bot.use_redis else MemoryStorage()
+    redis_db = Redis(
+        host=config.cache_db.host,
+        port=config.cache_db.port,
+        db=config.cache_db.database,
+    )
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp = Dispatcher(bot, storage=storage)
 
     bot['config'] = config
+    bot['cache_db'] = redis_db
     register_all_filters(dp)
     register_all_handlers(dp)
     await install_bot_commands(bot)
@@ -52,6 +59,7 @@ async def main():
         session = await bot.get_session()
         await session.close()
         await Base.pop_bind().close()
+        await redis_db.aclose()
 
 
 if __name__ == '__main__':

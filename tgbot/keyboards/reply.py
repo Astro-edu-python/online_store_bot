@@ -15,5 +15,5 @@ USER_REGISTER_KEYBOARD = ReplyKeyboardMarkup(
 USER_START_KEYBOARD = ReplyKeyboardMarkup([
     [rkb.USER_REFERRER_LINK, rkb.USER_QR_CODE],
     [rkb.ADD_BALANCE_BUTTON, rkb.MY_BALANCE_BUTTON],
-    [rkb.PRODUCTS_LIST_USER_COMMAND]
+    [rkb.PRODUCTS_LIST_USER_COMMAND, rkb.MY_BASKET_BUTTON]
 ], resize_keyboard=True)
