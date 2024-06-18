@@ -37,7 +37,7 @@ def order_notify_text(
     order: Order, product: Product, phone_number: str
 ) -> str:
     return (
-        f'Создан заказ!\n'
+        f'Заказ #{order.id}\n'
         f'Адрес доставки: {order.address}\n'
         f'Кол-во товаров в заказе: {order.count}\n'
         f'Сумма заказа: {order.order_sum}\n'

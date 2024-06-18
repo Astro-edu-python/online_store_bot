@@ -15,7 +15,8 @@ USER_REGISTER_KEYBOARD = ReplyKeyboardMarkup(
 USER_START_KEYBOARD = ReplyKeyboardMarkup([
     [rkb.USER_REFERRER_LINK, rkb.USER_QR_CODE],
     [rkb.ADD_BALANCE_BUTTON, rkb.MY_BALANCE_BUTTON],
-    [rkb.PRODUCTS_LIST_USER_COMMAND, rkb.MY_BASKET_BUTTON]
+    [rkb.PRODUCTS_LIST_USER_COMMAND, rkb.MY_BASKET_BUTTON],
+    [rkb.ORDERS_HISTORY_BUTTON]
 ], resize_keyboard=True)
 USER_GET_LOCATION_KEYBOARD = ReplyKeyboardMarkup(
     [[rkb.SEND_LOCATION_BUTTON]], resize_keyboard=True

@@ -41,3 +41,6 @@ MY_BASKET_BUTTON = KeyboardButton(
 SEND_LOCATION_BUTTON = KeyboardButton(
     UserReplyKeyboardCommands.send_location.value, request_location=True
 )
+ORDERS_HISTORY_BUTTON = KeyboardButton(
+    UserReplyKeyboardCommands.orders_history.value
+)

@@ -153,7 +153,7 @@ async def confirm_order_callback(callback: CallbackQuery, state: FSMContext):
         )
 
 
-def register_orders_handlers(dp: Dispatcher):
+def register_create_orders_handlers(dp: Dispatcher):
     dp.register_message_handler(
         order_product_count, state=OrderState.count, is_admin=False,
         is_authenticated=True

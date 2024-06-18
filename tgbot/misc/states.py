@@ -53,3 +53,7 @@ class OrderState(StatesGroup):
     address = State()
     comment = State()
     confirm = State()
+
+
+class OrdersHistoryState(StatesGroup):
+    show_history = State()
