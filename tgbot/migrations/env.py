@@ -14,6 +14,7 @@ sys.path.append(str(BASE_DIR))
 from tgbot.config import PostgresDbConfig
 import tgbot.models.user
 import tgbot.models.products
+import tgbot.models.orders
 from tgbot.models import Base
 
 config = context.config

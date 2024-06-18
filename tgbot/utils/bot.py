@@ -18,7 +18,7 @@ async def install_bot_commands(bot: Bot):
 
 
 async def notify_admins_message(
-    admins_ids: list[int, str], bot: Bot, message: str,
+    admins_ids: list[int], bot: Bot, message: str,
     parse_mode: str = "HTML"
 ):
     for admin in admins_ids:

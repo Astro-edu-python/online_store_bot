@@ -8,8 +8,9 @@ from redis.asyncio import Redis
 
 from tgbot.buttons.inline import make_buy_inline_kb, make_delete_inline_kb
 from tgbot.constants.commands import UserReplyKeyboardCommands
-from tgbot.misc.states import BasketShowState
+from tgbot.misc.states import BasketShowState, OrderState
 from tgbot.models.products import Product
+from tgbot.models.user import User
 from tgbot.services.basket.types import UserProfile
 from tgbot.utils.text import product_info_text
 
@@ -52,8 +53,8 @@ async def basket_products_command(message: Message):
 
 
 async def choose_product_callback(callback: CallbackQuery, state: FSMContext):
+    product_id: int = int(callback.data.split('_')[-1])
     if 'delete' in callback.data:
-        product_id: int = int(callback.data.split('delete_')[-1])
         redis: Redis = callback.bot['cache_db']
         user = await UserProfile.load(redis, callback.from_user.id)
         user.basket.remove_product(product_id)
@@ -66,10 +67,38 @@ async def choose_product_callback(callback: CallbackQuery, state: FSMContext):
             callback.from_user.id, 'Успешно удалил продукт'
         )
     else:
+        product = await Product.query.where(
+            Product.id == product_id
+        ).gino.first()
+        if not product.stock:
+            await callback.bot.send_message(
+                callback.from_user.id,
+                'Товара нет в наличии'
+            )
+            await state.finish()
+            return
+        user = await User.query.where(
+            User.id == callback.from_user.id
+        ).gino.first()
+        if user.balance < product.price:
+            await callback.bot.send_message(
+                callback.from_user.id,
+                'Недостаточно средств на балансе'
+            )
+            await state.finish()
+            return
+        available_count = int(user.balance // product.price)
+        await OrderState.count.set()
+        await state.update_data(product_id=product_id)
         await callback.bot.send_message(
             callback.from_user.id,
-            'Тут оформление заказа'
+            f'Отправьте кол-во товаров для покупки\n'
+            f'Исходя из вашего баланса вы можете купить {available_count} '
+            f'шт.\nМаксимальное кол-во доступных товаров: {product.stock} шт.'
         )
+    await callback.bot.delete_message(
+        callback.from_user.id, callback.message.message_id
+    )
 
 
 def register_basket_products_handlers(dp: Dispatcher):

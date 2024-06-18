@@ -17,3 +17,6 @@ USER_START_KEYBOARD = ReplyKeyboardMarkup([
     [rkb.ADD_BALANCE_BUTTON, rkb.MY_BALANCE_BUTTON],
     [rkb.PRODUCTS_LIST_USER_COMMAND, rkb.MY_BASKET_BUTTON]
 ], resize_keyboard=True)
+USER_GET_LOCATION_KEYBOARD = ReplyKeyboardMarkup(
+    [[rkb.SEND_LOCATION_BUTTON]], resize_keyboard=True
+)

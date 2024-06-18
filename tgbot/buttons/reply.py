@@ -38,3 +38,6 @@ PRODUCTS_LIST_USER_COMMAND = KeyboardButton(
 MY_BASKET_BUTTON = KeyboardButton(
     UserReplyKeyboardCommands.my_basket.value
 )
+SEND_LOCATION_BUTTON = KeyboardButton(
+    UserReplyKeyboardCommands.send_location.value, request_location=True
+)

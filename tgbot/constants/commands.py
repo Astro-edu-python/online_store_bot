@@ -13,6 +13,7 @@ class UserReplyKeyboardCommands(Enum):
     my_balance = 'Мой баланс 🤑'
     products = 'Товары 🏺'
     my_basket = 'Моя корзина 🛍️'
+    send_location = 'Отправить локацию 📍'
 
 
 class SuperuserReplyKeyboardCommands(Enum):

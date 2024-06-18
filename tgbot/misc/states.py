@@ -44,3 +44,12 @@ class ShowProductsState(StatesGroup):
 
 class BasketShowState(StatesGroup):
     choose_product = State()
+
+
+class OrderState(StatesGroup):
+    product_id = State()
+    count = State()
+    choose_address_type = State()
+    address = State()
+    comment = State()
+    confirm = State()

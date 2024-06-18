@@ -26,13 +26,13 @@ def make_delete_inline_kb(
 
 
 def make_change_inline_kb(
-    callback_data: str | int | float | bool | None = None
+    callback_data: str | int | float | bool = ''
 ) -> InlineKeyboardButton:
     return make_inline_kb_button('Изменить 📃', callback_data)
 
 
 def make_cart_inline_kb(
-    callback_data: str | int | float | bool | None = None
+    callback_data: str | int | float | bool = ''
 ) -> InlineKeyboardButton:
     return make_inline_kb_button(
         'В корзину 🧺', f'basket_{callback_data}'
@@ -40,10 +40,42 @@ def make_cart_inline_kb(
 
 
 def make_buy_inline_kb(
-    callback_data: str | int | float | bool | None = None
+    callback_data: str | int | float | bool = ''
 ) -> InlineKeyboardButton:
     return make_inline_kb_button(
         'Купить 💲', f'buy_{callback_data}'
+    )
+
+
+def make_deliver_by_location_inline_kb(
+    callback_data: str | int | float | bool = ''
+):
+    return make_inline_kb_button(
+        'Отправить свою локацию 📍', f'location_{callback_data}'
+    )
+
+
+def make_deliver_by_custom_location_inline_kb(
+    callback_data: str | int | float | bool = ''
+):
+    return make_inline_kb_button(
+        'Отправить другой адрес 🗺️', f'manual_location_{callback_data}'
+    )
+
+
+def make_confirm_order_inline_kb(
+    callback_data: str | int | float | bool = ''
+):
+    return make_inline_kb_button(
+        'Подтвердить ✅', f'confirm_{callback_data}'
+    )
+
+
+def make_cancel_inline_kb(
+    callback_data: str | int | float | bool = ''
+):
+    return make_inline_kb_button(
+        'Отменить ❌', f'cancel_{callback_data}'
     )
 
 
