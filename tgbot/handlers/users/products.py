@@ -5,12 +5,15 @@ from aiogram.types import (
 )
 from redis.asyncio import Redis
 
-from tgbot.buttons.inline import SHOW_CATEGORY_PRODUCTS, make_cart_inline_kb
+from tgbot.buttons.inline import (
+    SHOW_CATEGORY_PRODUCTS, make_cart_inline_kb, make_buy_inline_kb
+)
 from tgbot.config import Config
 from tgbot.constants.commands import UserReplyKeyboardCommands
 from tgbot.keyboards.inline import make_inline_kb_from_obj_list
-from tgbot.misc.states import ShowProductsState
+from tgbot.misc.states import ShowProductsState, OrderState
 from tgbot.models.products import Category, Product
+from tgbot.models.user import User
 from tgbot.services.basket.types import UserProfile, UserBasket
 from tgbot.utils.paginator import BotPagePaginator
 from tgbot.utils.text import product_info_text
@@ -51,6 +54,7 @@ async def choose_product_category_callback(
             await ShowProductsState.choose_product.set()
             keyboard = InlineKeyboardMarkup()
             keyboard.add(make_cart_inline_kb(products[0].id))
+            keyboard.inline_keyboard[0].append(make_buy_inline_kb(products[0].id))
             await paginator.add_navigate_keyboard_if_exists(keyboard)
             await callback.bot.send_photo(
                 callback.from_user.id,
@@ -89,6 +93,7 @@ async def choose_products_callback(callback: CallbackQuery, state: FSMContext):
         product: list[Product] = await paginator.paginate()
         keyboard = InlineKeyboardMarkup()
         keyboard.add(make_cart_inline_kb(product[0].id))
+        keyboard.inline_keyboard[0].append(make_buy_inline_kb(product[0].id))
         await paginator.add_navigate_keyboard_if_exists(keyboard)
         await callback.bot.send_photo(
             callback.from_user.id,
@@ -110,6 +115,37 @@ async def choose_products_callback(callback: CallbackQuery, state: FSMContext):
             'Успешно добавил в корзину'
         )
         await state.finish()
+    else:
+        product_id: int = int(callback.data.split('_')[-1])
+        product: Product = await Product.query.where(
+            Product.id == product_id
+        ).gino.first()
+        if not product.stock:
+            await callback.bot.send_message(
+                callback.from_user.id,
+                'Товара нет в наличии'
+            )
+            await state.finish()
+            return
+        user = await User.query.where(
+            User.id == callback.from_user.id
+        ).gino.first()
+        if user.balance < product.price:
+            await callback.bot.send_message(
+                callback.from_user.id,
+                'Недостаточно средств на балансе'
+            )
+            await state.finish()
+        else:
+            available_count = int(user.balance // product.price)
+            await OrderState.count.set()
+            await state.update_data(product_id=product_id)
+            await callback.bot.send_message(
+                callback.from_user.id,
+                f'Отправьте кол-во товаров для покупки\n'
+                f'Исходя из вашего баланса вы можете купить {available_count} '
+                f'шт.\nМаксимальное кол-во доступных товаров: {product.stock} шт.'
+            )
     await callback.bot.delete_message(
         callback.from_user.id,
         callback.message.message_id
