@@ -15,6 +15,7 @@ class UserReplyKeyboardCommands(Enum):
     my_basket = 'Моя корзина 🛍️'
     send_location = 'Отправить локацию 📍'
     orders_history = 'История заказов 📜'
+    reviews_history = 'Мои отзывы ✒️'
 
 
 class SuperuserReplyKeyboardCommands(Enum):

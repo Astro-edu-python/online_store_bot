@@ -1,5 +1,6 @@
 from tgbot.models.orders import Order
 from tgbot.models.products import Product
+from tgbot.models.reviews import Review
 
 
 def user_mention_text_html(chat_id: int, display_text: str) -> str:
@@ -48,4 +49,11 @@ def order_notify_text(
         f'Название: {product.name}\n'
         f'Цена: {product.price}\n'
         f'Заказчик: +{user_mention_text_html(order.user, phone_number)}'
+    )
+
+
+def review_display_text(review: Review) -> str:
+    return (
+        f'⭐: {review.rate * "⭐"}\n'
+        f'✒️: {review.review}\n'
     )
