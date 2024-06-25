@@ -44,3 +44,6 @@ SEND_LOCATION_BUTTON = KeyboardButton(
 ORDERS_HISTORY_BUTTON = KeyboardButton(
     UserReplyKeyboardCommands.orders_history.value
 )
+MY_REVIEWS_BUTTON = KeyboardButton(
+    UserReplyKeyboardCommands.reviews_history.value
+)

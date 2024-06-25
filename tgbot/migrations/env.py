@@ -15,6 +15,7 @@ from tgbot.config import PostgresDbConfig
 import tgbot.models.user
 import tgbot.models.products
 import tgbot.models.orders
+import tgbot.models.reviews
 from tgbot.models import Base
 
 config = context.config

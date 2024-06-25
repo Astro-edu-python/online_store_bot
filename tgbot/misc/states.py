@@ -57,3 +57,13 @@ class OrderState(StatesGroup):
 
 class OrdersHistoryState(StatesGroup):
     show_history = State()
+
+
+class CreateReviewState(StatesGroup):
+    choose_product = State()
+    review = State()
+    rate = State()
+
+
+class ReviewHistoryState(StatesGroup):
+    show_history = State()

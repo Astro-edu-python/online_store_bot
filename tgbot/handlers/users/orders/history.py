@@ -3,16 +3,18 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import (
     Message, InlineKeyboardMarkup, InputFile, CallbackQuery
 )
+from sqlalchemy import and_
 
-from tgbot.buttons.inline import make_cancel_inline_kb
+from tgbot.buttons.inline import make_cancel_inline_kb, make_review_inline_kb
 from tgbot.config import Config
 from tgbot.constants.commands import UserReplyKeyboardCommands
-from tgbot.misc.states import OrdersHistoryState
+from tgbot.misc.states import OrdersHistoryState, CreateReviewState
 from tgbot.models.orders import Order
 from tgbot.models.products import Product
+from tgbot.models.reviews import Review
 from tgbot.models.user import User
 from tgbot.utils.paginator import BotPagePaginator
-from tgbot.utils.text import order_notify_text
+from tgbot.utils.text import order_notify_text, review_display_text
 
 
 async def orders_history_command(message: Message):
@@ -34,6 +36,7 @@ async def orders_history_command(message: Message):
     keyboard = InlineKeyboardMarkup()
     keyboard.add(make_cancel_inline_kb())
     await paginator.add_navigate_keyboard_if_exists(keyboard)
+    keyboard.add(make_review_inline_kb(product.id))
     await message.bot.send_photo(
         message.from_user.id,
         InputFile(product.photo),
@@ -57,11 +60,31 @@ async def show_history_callback(callback: CallbackQuery, state: FSMContext):
         keyboard = InlineKeyboardMarkup()
         keyboard.add(make_cancel_inline_kb())
         await paginator.add_navigate_keyboard_if_exists(keyboard)
+        keyboard.add(make_review_inline_kb(product.id))
         await callback.bot.send_photo(
             callback.from_user.id,
             InputFile(product.photo),
             order_notify_text(order, product, user.phone_number),
             reply_markup=keyboard
+        )
+    elif 'review' in callback.data:
+        product_id = int(callback.data.split('_')[-1])
+        review: Review | None = await Review.query.where(and_(
+            Review.product_id == product_id,
+            Review.user_id == callback.from_user.id
+        )).gino.first()
+        if review:
+            await callback.bot.send_message(
+                callback.from_user.id,
+                f'У вас уже есть отзыв на этот товар\n'
+                f'{review_display_text(review)}'
+            )
+            return
+        await CreateReviewState.review.set()
+        await state.update_data(choose_product=product_id)
+        await callback.bot.send_message(
+            callback.from_user.id,
+            'Отлично! Отправьте отзыв'
         )
     else:
         await state.finish()

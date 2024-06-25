@@ -79,6 +79,14 @@ def make_cancel_inline_kb(
     )
 
 
+def make_review_inline_kb(
+    callback_data: str | int | float | bool = ''
+):
+    return make_inline_kb_button(
+        'Оставить отзыв ✒️', f'review_{callback_data}'
+    )
+
+
 def make_inline_kb_button_from_obj(
     obj: object, attr_name: str, callback_attr_name: str | None = None
 ) -> InlineKeyboardButton:

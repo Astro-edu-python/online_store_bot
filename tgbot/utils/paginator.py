@@ -1,7 +1,6 @@
 from typing import Any
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from redis.asyncio import Redis
 
 from tgbot.models import Base
 
@@ -10,12 +9,13 @@ class PagePaginator:
 
     def __init__(
         self, page_per_count: int,  model: Base, page_num: int = 1,
-        condition: Any | None = None
+        condition: Any | None = None, id_field: str = 'id'
     ):
         self.__page_per_count: int = page_per_count
         self.__model: Base = model
         self.__page_num = page_num
         self.__condition: Any | None = condition
+        self.id_field = id_field
 
     @property
     def page_num(self):
@@ -32,11 +32,11 @@ class PagePaginator:
     async def pages_count(self) -> int:
         if self.condition is not None:
             count = await Base.select([Base.func.count(
-                self.__model.id
-            )]).where(self.__condition).gino.scalar()
+                getattr(self.__model, self.id_field)
+            )]).where(self.condition).gino.scalar()
         else:
             count = await Base.select([
-                Base.func.count(self.__model.id)
+                getattr(self.__model, self.id_field)
             ]).gino.scalar()
         pages_count = count // self.__page_per_count or 1
         return pages_count
@@ -47,28 +47,26 @@ class PagePaginator:
     async def has_prev_page(self) -> bool:
         return 1 <= self.__page_num - 1 <= await self.pages_count()
 
-    async def paginate(
-        self, order_by: str = 'id'
-    ) -> list[Base.Model]:
+    async def paginate(self) -> list[Base.Model]:
         if self.__page_num == 1:
             offset = 0
         else:
             offset = self.__page_per_count * self.__page_num - 1
         async with Base.transaction():
             cursor = await (
-                self.__condition_parse(self.condition)
-                .order_by(order_by).gino.iterate()
+                self.__condition_parse()
+                .order_by(self.id_field).gino.iterate()
             )
             if offset:
                 await cursor.forward(offset)
             result = await cursor.many(self.__page_per_count)
         return result
 
-    def __condition_parse(self, condition: Any | None = None):
-        if condition is not None:
+    def __condition_parse(self):
+        if self.condition is not None:
             return (
                 self.__model
-                .query.where(condition)
+                .query.where(self.condition)
             )
         return (
             self.__model.query
@@ -79,9 +77,9 @@ class BotPagePaginator(PagePaginator):
 
     def __init__(
         self, page_per_count: int, model: Base, page_num: int = 1,
-        condition: Any | None = None
+        condition: Any | None = None, id_field: str = 'id'
     ):
-        super().__init__(page_per_count, model, page_num, condition)
+        super().__init__(page_per_count, model, page_num, condition, id_field)
 
     def has_next_page_inline_btn(self) -> InlineKeyboardButton:
         return InlineKeyboardButton(
