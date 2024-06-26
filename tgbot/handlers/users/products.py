@@ -6,17 +6,21 @@ from aiogram.types import (
 from redis.asyncio import Redis
 
 from tgbot.buttons.inline import (
-    SHOW_CATEGORY_PRODUCTS, make_cart_inline_kb, make_buy_inline_kb
+    SHOW_CATEGORY_PRODUCTS, make_cart_inline_kb, make_buy_inline_kb,
+    make_show_reviews_inline_kb, make_cancel_inline_kb
 )
 from tgbot.config import Config
 from tgbot.constants.commands import UserReplyKeyboardCommands
 from tgbot.keyboards.inline import make_inline_kb_from_obj_list
-from tgbot.misc.states import ShowProductsState, OrderState
+from tgbot.misc.states import (
+    ShowProductsState, OrderState, ProductReviewsState
+)
 from tgbot.models.products import Category, Product
+from tgbot.models.reviews import Review
 from tgbot.models.user import User
 from tgbot.services.basket.types import UserProfile, UserBasket
 from tgbot.utils.paginator import BotPagePaginator
-from tgbot.utils.text import product_info_text
+from tgbot.utils.text import product_info_text, review_display_text
 
 
 async def get_products_command(message: Message):
@@ -56,6 +60,7 @@ async def choose_product_category_callback(
             keyboard.add(make_cart_inline_kb(products[0].id))
             keyboard.inline_keyboard[0].append(make_buy_inline_kb(products[0].id))
             await paginator.add_navigate_keyboard_if_exists(keyboard)
+            keyboard.add(make_show_reviews_inline_kb(products[0].id))
             await callback.bot.send_photo(
                 callback.from_user.id,
                 InputFile(products[0].photo),
@@ -115,6 +120,32 @@ async def choose_products_callback(callback: CallbackQuery, state: FSMContext):
             'Успешно добавил в корзину'
         )
         await state.finish()
+    elif 'reviews' in callback.data:
+        config: Config = callback.bot['config']
+        product_id = int(callback.data.split('reviews_')[-1])
+        paginator = BotPagePaginator(
+            config.misc.PRODUCTS_PAGINATE_PER_COUNT, Review,
+            condition=Review.product_id == product_id, id_field='product_id'
+        )
+        reviews: list[Review] = await paginator.paginate()
+        if not reviews:
+            await callback.answer('У этого товара нет отзывов')
+            return
+        review = reviews[0]
+        product: Product = await Product.get(review.product_id)
+        await ProductReviewsState.reviews.set()
+        keyboard = InlineKeyboardMarkup()
+        keyboard.add(make_cancel_inline_kb())
+        await paginator.add_navigate_keyboard_if_exists(keyboard)
+        await callback.bot.send_photo(
+            callback.from_user.id,
+            InputFile(product.photo),
+            caption=(
+                'Товар\n' + product_info_text(product) + '\n\nОтзыв\n' +
+                review_display_text(review)
+            ),
+            reply_markup=keyboard
+        )
     else:
         product_id: int = int(callback.data.split('_')[-1])
         product: Product = await Product.query.where(
@@ -152,6 +183,42 @@ async def choose_products_callback(callback: CallbackQuery, state: FSMContext):
     )
 
 
+async def reviews_list_callback(callback: CallbackQuery, state: FSMContext):
+    if 'page' in callback.data:
+        config: Config = callback.bot['config']
+        page_num = int(callback.data.split('_')[-1])
+        product_id: int = int(callback.data.split('_')[-1])
+        paginator = BotPagePaginator(
+            config.misc.PRODUCTS_PAGINATE_PER_COUNT, Review, page_num,
+            Review.product_id == product_id
+        )
+        reviews: list[Review] = await paginator.paginate()
+        review = reviews[0]
+        product: Product = await Product.get(review.product_id)
+        keyboard = InlineKeyboardMarkup()
+        keyboard.add(make_cancel_inline_kb())
+        await paginator.add_navigate_keyboard_if_exists(keyboard)
+        await callback.bot.send_photo(
+            callback.from_user.id,
+            InputFile(product.photo),
+            caption=(
+                'Товар\n' + product_info_text(product) + '\n\nОтзыв\n' +
+                review_display_text(review)
+            ),
+            reply_markup=keyboard
+        )
+    else:
+        await state.finish()
+        await callback.bot.send_message(
+            callback.from_user.id,
+            'Отменил действие'
+        )
+    await callback.bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+
 def register_products_handlers(dp: Dispatcher):
     dp.register_message_handler(
         get_products_command, text=UserReplyKeyboardCommands.products.value,
@@ -163,4 +230,7 @@ def register_products_handlers(dp: Dispatcher):
     )
     dp.register_callback_query_handler(
         choose_products_callback, state=ShowProductsState.choose_product
+    )
+    dp.register_callback_query_handler(
+        reviews_list_callback, state=ProductReviewsState.reviews
     )
