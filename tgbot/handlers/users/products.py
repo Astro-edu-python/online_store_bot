@@ -4,6 +4,7 @@ from aiogram.types import (
     Message, CallbackQuery, InputFile, InlineKeyboardMarkup
 )
 from redis.asyncio import Redis
+from sqlalchemy import and_
 
 from tgbot.buttons.inline import (
     SHOW_CATEGORY_PRODUCTS, make_cart_inline_kb, make_buy_inline_kb,
@@ -92,8 +93,11 @@ async def choose_products_callback(callback: CallbackQuery, state: FSMContext):
     if 'page' in callback.data:
         config: Config = callback.bot['config']
         page_num = int(callback.data.split('_')[-1])
+        async with state.proxy() as data:
+            category_name = data['choose_category']
         paginator = BotPagePaginator(
-            config.misc.PRODUCTS_PAGINATE_PER_COUNT, Product, page_num
+            config.misc.PRODUCTS_PAGINATE_PER_COUNT, Product, page_num,
+            condition=Product.category == category_name
         )
         product: list[Product] = await paginator.paginate()
         keyboard = InlineKeyboardMarkup()

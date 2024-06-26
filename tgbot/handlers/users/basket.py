@@ -30,6 +30,7 @@ async def basket_products_command(message: Message):
         if product:
             break
         user.basket.products_ids.pop(0)
+        await user.insert_to_db(redis)
     else:
         await message.answer('Продуктов в корзине нет')
         return
@@ -41,7 +42,7 @@ async def basket_products_command(message: Message):
     )
     if len(user.basket.products_ids) > 1:
         keyboard.inline_keyboard[0].append(InlineKeyboardButton(
-            '➡️', callback_data=f'page_2'
+            '➡️', callback_data=f'page_1'
         ))
     await BasketShowState.choose_product.set()
     await message.bot.send_photo(
@@ -53,10 +54,10 @@ async def basket_products_command(message: Message):
 
 
 async def choose_product_callback(callback: CallbackQuery, state: FSMContext):
+    redis: Redis = callback.bot['cache_db']
+    user = await UserProfile.load(redis, callback.from_user.id)
     product_id: int = int(callback.data.split('_')[-1])
     if 'delete' in callback.data:
-        redis: Redis = callback.bot['cache_db']
-        user = await UserProfile.load(redis, callback.from_user.id)
         user.basket.remove_product(product_id)
         await user.insert_to_db(redis)
         await state.finish()
@@ -65,6 +66,43 @@ async def choose_product_callback(callback: CallbackQuery, state: FSMContext):
         )
         await callback.bot.send_message(
             callback.from_user.id, 'Успешно удалил продукт'
+        )
+    elif 'page' in callback.data:
+        page = int(callback.data.split('_')[-1])
+        product: Product | None = None
+        while len(user.basket.products_ids) >= page:
+            product_id: int = user.basket.products_ids[page]
+            product = await Product.query.where(
+                Product.id == product_id
+            ).gino.first()
+            if product:
+                break
+            user.basket.products_ids.pop(page)
+            await user.insert_to_db(redis)
+        else:
+            await callback.answer('Продуктов в корзине нет')
+            await state.finish()
+            return
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[[
+                make_buy_inline_kb(product.id),
+                make_delete_inline_kb(f'delete_{product.id}')
+            ]]
+        )
+        if 0 <= page + 1 < len(user.basket.products_ids):
+            keyboard.inline_keyboard[0].append(InlineKeyboardButton(
+                '➡️', callback_data=f'page_{page+1}'
+            ))
+        if 0 <= page - 1 < len(user.basket.products_ids):
+            keyboard.inline_keyboard[0].insert(0, InlineKeyboardButton(
+                '⬅️', callback_data=f'page_{page-1}'
+            ))
+        await BasketShowState.choose_product.set()
+        await callback.bot.send_photo(
+            callback.from_user.id,
+            InputFile(product.photo),
+            product_info_text(product),
+            reply_markup=keyboard
         )
     else:
         product = await Product.query.where(
