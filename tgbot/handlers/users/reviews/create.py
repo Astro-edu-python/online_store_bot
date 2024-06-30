@@ -37,7 +37,8 @@ async def review_rate_handler(message: Message, state: FSMContext):
         rate=rate
     )
     await message.answer(
-        'Ваш отзыв добавлен успешно\n' + review_display_text(review)
+        'Ваш отзыв отправлен на модерацию, как только модератор одобрит '
+        'оно будет опубликовано\n' + review_display_text(review)
     )
 
 

@@ -13,7 +13,7 @@ def get_referrer_link(bot_username: str, user_id: int) -> str:
 
 def product_info_text(product: Product) -> str:
     text = (
-        f'Продукт: {product.name}',
+        f'Продукт: #{product.id} {product.name}',
         f'Категория: {product.category}',
         f'Описание: {product.description}',
         f'Цена: {product.price}',
@@ -56,4 +56,5 @@ def review_display_text(review: Review) -> str:
     return (
         f'⭐: {review.rate * "⭐"}\n'
         f'✒️: {review.review}\n'
+        f'Статус: {review.status.get_choice_value(review.status)}'
     )

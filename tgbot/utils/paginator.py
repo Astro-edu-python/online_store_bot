@@ -81,33 +81,42 @@ class BotPagePaginator(PagePaginator):
     ):
         super().__init__(page_per_count, model, page_num, condition, id_field)
 
-    def has_next_page_inline_btn(self) -> InlineKeyboardButton:
+    def has_next_page_inline_btn(
+        self, callback_data: str
+    ) -> InlineKeyboardButton:
         return InlineKeyboardButton(
-            '➡️', callback_data=f'page_{str(self.page_num + 1)}'
+            '➡️', callback_data=f'{callback_data}{str(self.page_num + 1)}'
         )
 
-    def has_prev_page_inline_btn(self) -> InlineKeyboardButton:
+    def has_prev_page_inline_btn(
+        self, callback_data: str
+    ) -> InlineKeyboardButton:
         return InlineKeyboardButton(
-            '⬅️', callback_data=f'page_{str(self.page_num - 1)}'
+            '⬅️', callback_data=f'{callback_data}{str(self.page_num - 1)}'
         )
 
     async def add_navigate_keyboard_if_exists(
-        self, keyboard: InlineKeyboardMarkup
+        self, keyboard: InlineKeyboardMarkup,
+        extra_callback_data: str = 'page_'
     ) -> InlineKeyboardMarkup:
         has_next = await self.has_next_page()
         has_prev = await self.has_prev_page()
         if has_next:
             if keyboard.inline_keyboard:
                 keyboard.inline_keyboard[-1].append(
-                    self.has_next_page_inline_btn()
+                    self.has_next_page_inline_btn(extra_callback_data)
                 )
             else:
-                keyboard.add(self.has_next_page_inline_btn())
+                keyboard.add(
+                    self.has_next_page_inline_btn(extra_callback_data)
+                )
         if has_prev:
             if keyboard.inline_keyboard:
                 keyboard.inline_keyboard[0].insert(
-                    0, self.has_prev_page_inline_btn()
+                    0, self.has_prev_page_inline_btn(extra_callback_data)
                 )
             else:
-                keyboard.add(self.has_prev_page_inline_btn())
+                keyboard.add(
+                    self.has_prev_page_inline_btn(extra_callback_data)
+                )
         return keyboard
