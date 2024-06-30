@@ -1,9 +1,29 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, UniqueConstraint
+from enum import Enum
+
+from sqlalchemy import (
+    Column, Integer, String, ForeignKey, UniqueConstraint, Enum as SQEnum
+)
 
 from tgbot.models import Base
 from tgbot.models.products import Product
 from tgbot.models.user import User
 from tgbot.utils.exceptions import BotException
+
+
+class ReviewsStatusChoices(Enum):
+    MODERATE = 'MODERATE'
+    PUBLISHED = 'PUBLISHED'
+    REJECTED = 'REJECTED'
+
+    @classmethod
+    def get_choice_value(cls, choice_value: str | Enum):
+        enum_ = cls(choice_value)
+        dct_ = {
+            cls.MODERATE: 'В модерации',
+            cls.PUBLISHED: 'Одобрен',
+            cls.REJECTED: 'Отклонен',
+        }
+        return dct_[enum_]
 
 
 class Review(Base.Model):
@@ -20,6 +40,9 @@ class Review(Base.Model):
         f'{Product.__tablename__}.id', ondelete='CASCADE'
     ))
     rate = Column(Integer)
+    status = Column(
+        SQEnum(ReviewsStatusChoices), default=ReviewsStatusChoices.MODERATE
+    )
 
     @classmethod
     def validate(

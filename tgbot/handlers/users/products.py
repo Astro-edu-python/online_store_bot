@@ -17,7 +17,7 @@ from tgbot.misc.states import (
     ShowProductsState, OrderState, ProductReviewsState
 )
 from tgbot.models.products import Category, Product
-from tgbot.models.reviews import Review
+from tgbot.models.reviews import Review, ReviewsStatusChoices
 from tgbot.models.user import User
 from tgbot.services.basket.types import UserProfile, UserBasket
 from tgbot.utils.paginator import BotPagePaginator
@@ -104,6 +104,7 @@ async def choose_products_callback(callback: CallbackQuery, state: FSMContext):
         keyboard.add(make_cart_inline_kb(product[0].id))
         keyboard.inline_keyboard[0].append(make_buy_inline_kb(product[0].id))
         await paginator.add_navigate_keyboard_if_exists(keyboard)
+        keyboard.add(make_show_reviews_inline_kb(product[0].id))
         await callback.bot.send_photo(
             callback.from_user.id,
             InputFile(product[0].photo),
@@ -129,7 +130,10 @@ async def choose_products_callback(callback: CallbackQuery, state: FSMContext):
         product_id = int(callback.data.split('reviews_')[-1])
         paginator = BotPagePaginator(
             config.misc.PRODUCTS_PAGINATE_PER_COUNT, Review,
-            condition=Review.product_id == product_id, id_field='product_id'
+            condition=and_(
+                Review.product_id == product_id,
+                Review.status == ReviewsStatusChoices.PUBLISHED
+            ), id_field='product_id'
         )
         reviews: list[Review] = await paginator.paginate()
         if not reviews:
@@ -140,7 +144,9 @@ async def choose_products_callback(callback: CallbackQuery, state: FSMContext):
         await ProductReviewsState.reviews.set()
         keyboard = InlineKeyboardMarkup()
         keyboard.add(make_cancel_inline_kb())
-        await paginator.add_navigate_keyboard_if_exists(keyboard)
+        await paginator.add_navigate_keyboard_if_exists(
+            keyboard, f'page_{product_id}_'
+        )
         await callback.bot.send_photo(
             callback.from_user.id,
             InputFile(product.photo),
@@ -191,17 +197,22 @@ async def reviews_list_callback(callback: CallbackQuery, state: FSMContext):
     if 'page' in callback.data:
         config: Config = callback.bot['config']
         page_num = int(callback.data.split('_')[-1])
-        product_id: int = int(callback.data.split('_')[-1])
+        product_id = int(callback.data.split('_')[-2])
         paginator = BotPagePaginator(
             config.misc.PRODUCTS_PAGINATE_PER_COUNT, Review, page_num,
-            Review.product_id == product_id
+            condition=and_(
+                Review.status == ReviewsStatusChoices.PUBLISHED,
+                Review.product_id == product_id
+            ), id_field='product_id'
         )
         reviews: list[Review] = await paginator.paginate()
         review = reviews[0]
         product: Product = await Product.get(review.product_id)
         keyboard = InlineKeyboardMarkup()
         keyboard.add(make_cancel_inline_kb())
-        await paginator.add_navigate_keyboard_if_exists(keyboard)
+        await paginator.add_navigate_keyboard_if_exists(
+            keyboard, f'page_{product_id}_'
+        )
         await callback.bot.send_photo(
             callback.from_user.id,
             InputFile(product.photo),

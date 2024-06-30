@@ -71,3 +71,7 @@ class ReviewHistoryState(StatesGroup):
 
 class ProductReviewsState(StatesGroup):
     reviews = State()
+
+
+class ModerateReviewsState(StatesGroup):
+    show_history = State()

@@ -17,6 +17,9 @@ ADMIN_ADD_PRODUCT = KeyboardButton(
 PRODUCTS_LIST_COMMAND = KeyboardButton(
     AdminsReplyKeyboardCommands.products_list.value
 )
+ADMIN_MODERATE_REVIEWS_COMMAND = KeyboardButton(
+    AdminsReplyKeyboardCommands.moderate_reviews.value
+)
 SEND_CONTACT_BUTTON = KeyboardButton(
     UserReplyKeyboardCommands.share_number.value, request_contact=True
 )

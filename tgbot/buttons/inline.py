@@ -95,6 +95,14 @@ def make_show_reviews_inline_kb(
     )
 
 
+def ban_reviews_inline_kb(
+    callback_data: str | int | float | bool = ''
+):
+    return make_inline_kb_button(
+        'Отклонить ❌', f'reject_{callback_data}'
+    )
+
+
 def make_inline_kb_button_from_obj(
     obj: object, attr_name: str, callback_attr_name: str | None = None
 ) -> InlineKeyboardButton:
